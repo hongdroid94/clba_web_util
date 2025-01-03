@@ -56,3 +56,111 @@ td button {
 td button:hover {
   background-color: #da190b;
 }
+
+.dragon-type-buttons {
+  display: flex;
+  gap: 0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.dragon-type-buttons button {
+  flex: 1;
+  padding: 8px 16px;
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 0;
+}
+
+.dragon-type-buttons button:first-child {
+  border-right: none;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.dragon-type-buttons button:last-child {
+  border-left: none;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.dragon-type-buttons button:first-child.active {
+  background-color: #2196F3;
+  color: white;
+  border-color: #1976D2;
+}
+
+.dragon-type-buttons button:last-child.active {
+  background-color: #F44336;
+  color: white;
+  border-color: #D32F2F;
+}
+
+.dragon-type-buttons button:first-child:hover {
+  background-color: #2196F3;
+  color: white;
+}
+
+.dragon-type-buttons button:last-child:hover {
+  background-color: #F44336;
+  color: white;
+}
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.sortable:hover {
+  background-color: #e8e8e8;
+}
+
+input[type="text"] {
+  width: 80px;
+  text-align: center;
+}
+
+/* 반응형 스타일 추가 */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 모바일 화면 (768px 미만) */
+@media screen and (max-width: 767px) {
+  .input-container {
+    flex-direction: column;
+  }
+
+  .input-container input,
+  .input-container button,
+  .dragon-type-buttons {
+    width: 100%;
+  }
+
+  table {
+    min-width: 600px;
+  }
+}
+
+/* 태블릿 화면 (768px 이상 1023px 이하) */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .App {
+    padding: 15px;
+  }
+
+  table {
+    min-width: 700px;
+  }
+}
+
+/* 데스크탑 화면 (1024px 이상) */
+@media screen and (min-width: 1024px) {
+  .App {
+    max-width: 1000px;
+  }
+}
