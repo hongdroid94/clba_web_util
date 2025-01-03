@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import { TimerData, DragonType } from './types/timer';
 import Toast from './components/Toast';
@@ -19,6 +19,23 @@ function App() {
       Notification.requestPermission();
     }
   }, []);
+
+  // 알림 표시 함수를 useCallback으로 감싸기
+  const showNotification = useCallback((timer: TimerData) => {
+    // 소리 재생
+    ALERT_SOUND.play();
+
+    // 토스트 메시지 표시
+    showToast(`${timer.channelNumber}채널 ${timer.dragonType} 리젠 시간입니다!`);
+
+    // 데스크톱 알림
+    if (Notification.permission === 'granted') {
+      new Notification('드래곤 리젠 알림', {
+        body: `${timer.channelNumber}채널 ${timer.dragonType} 리젠 시간입니다!`,
+        icon: '/favicon.ico'
+      });
+    }
+  }, []);  // 빈 dependency array
 
   // 실시간 타이머 업데이트
   useEffect(() => {
@@ -51,7 +68,7 @@ function App() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [showNotification]);  // showNotification을 dependency에 추가
 
   // 토스트 표시 함수
   const showToast = (message: string) => {
@@ -60,23 +77,6 @@ function App() {
     setTimeout(() => {
       setToast(prev => ({ ...prev, isVisible: false }));
     }, 3000);
-  };
-
-  // 알림 표시 함수
-  const showNotification = (timer: TimerData) => {
-    // 소리 재생
-    ALERT_SOUND.play();
-
-    // 토스트 메시지 표시
-    showToast(`${timer.channelNumber}채널 ${timer.dragonType} 리젠 시간입니다!`);
-
-    // 데스크톱 알림
-    if (Notification.permission === 'granted') {
-      new Notification('드래곤 리젠 알림', {
-        body: `${timer.channelNumber}채널 ${timer.dragonType} 리젠 시간입니다!`,
-        icon: '/favicon.ico'
-      });
-    }
   };
 
   const handleAddTimer = () => {
