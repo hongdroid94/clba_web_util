@@ -123,13 +123,17 @@ function App() {
     const killedDate = new Date(now);
     killedDate.setHours(hours, minutes, 0, 0);
 
-    // 미래 시간 처리 로직 수정
-    if (killedDate.getTime() - now.getTime() > 24 * 60 * 60 * 1000) {
+    // 시간 처리 로직 수정
+    if (killedDate.getTime() > now.getTime()) {
+      // 입력된 시간이 현재보다 미래인 경우, 하루 전으로 설정
       killedDate.setDate(killedDate.getDate() - 1);
+    } else if (now.getTime() - killedDate.getTime() > 12 * 60 * 60 * 1000) {
+      // 입력된 시간이 12시간 이상 과거인 경우, 다음날로 설정
+      killedDate.setDate(killedDate.getDate() + 1);
     }
 
     const respawnDate = new Date(killedDate);
-    respawnDate.setMinutes(respawnDate.getMinutes() + (dragonType === '수룡' ? 30 : 40));
+    respawnDate.setMinutes(respawnDate.getMinutes() + (dragonType === '수룡' ? 35 : 40));
 
     const newTimer: TimerData = {
       id: Date.now(),
@@ -151,6 +155,41 @@ function App() {
     setTimerList(prev => prev.filter(timer => timer.id !== id));
   };
 
+  // 시간 입력 필드에 대한 ref 추가
+  const timeInputRef = React.useRef<HTMLInputElement>(null);
+  
+  // 채널 번호 입력 처리
+  const handleChannelNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, '').slice(0, 4);
+    setChannelNumber(value);
+    
+    // 4자리 입력 완료시 자동으로 다음 필드로 이동
+    if (value.length === 4 && timeInputRef.current) {
+      timeInputRef.current.focus();
+    }
+  };
+
+  // 시간 입력 처리
+  const handleTimeInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, '').slice(0, 4);
+    if (value.length === 4) {
+      const hours = value.slice(0, 2);
+      const minutes = value.slice(2, 4);
+      if (parseInt(hours) < 24 && parseInt(minutes) < 60) {
+        setKilledTime(`${hours}:${minutes}`);
+      }
+    } else {
+      setKilledTime(value);
+    }
+  };
+
+  // 키 입력 이벤트 처리
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && channelNumber && killedTime) {
+      handleAddTimer();
+    }
+  };
+
   return (
     <div className="App">
       <h1>클바유틸</h1>
@@ -159,24 +198,17 @@ function App() {
           type="number"
           placeholder="채널 번호"
           value={channelNumber}
-          onChange={(e) => setChannelNumber(e.target.value)}
+          onChange={handleChannelNumberChange}
+          maxLength={4}
         />
         <input
+          ref={timeInputRef}
           type="text"
           placeholder="HHmm"
           value={killedTime}
-          onChange={(e) => {
-            const value = e.target.value.replace(/\D/g, '').slice(0, 4);
-            if (value.length === 4) {
-              const hours = value.slice(0, 2);
-              const minutes = value.slice(2, 4);
-              if (parseInt(hours) < 24 && parseInt(minutes) < 60) {
-                setKilledTime(`${hours}:${minutes}`);
-              }
-            } else {
-              setKilledTime(value);
-            }
-          }}
+          onChange={handleTimeInputChange}
+          onKeyPress={handleKeyPress}
+          maxLength={5}
         />
         <div className="dragon-type-buttons">
           <button
@@ -224,8 +256,16 @@ function App() {
                 <td>{index + 1}</td>
                 <td>{timer.channelNumber}</td>
                 <td>{timer.killedTime}</td>
-                <td>{timer.dragonType}</td>
-                <td>{timer.respawnTime.toLocaleTimeString()}</td>
+                <td className={timer.dragonType === '수룡' ? 'dragon-water' : 'dragon-fire'}>
+                  {timer.dragonType}
+                </td>
+                <td>
+                  {timer.respawnTime.toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    hour12: false 
+                  })}
+                </td>
                 <td>{timer.remainingTime}</td>
                 <td>
                   <button onClick={() => handleDeleteTimer(timer.id)}>삭제</button>

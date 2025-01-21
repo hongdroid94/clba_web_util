@@ -118,6 +118,8 @@ td button:hover {
   background-color: #e8e8e8;
 }
 
+/* 입력 필드 너비 통일 */
+input[type="number"],
 input[type="text"] {
   width: 80px;
   text-align: center;
@@ -163,4 +165,15 @@ input[type="text"] {
   .App {
     max-width: 1000px;
   }
+}
+
+/* 드래곤 타입 텍스트 색상 */
+.dragon-water {
+  color: #2196F3;
+  font-weight: bold;
+}
+
+.dragon-fire {
+  color: #F44336;
+  font-weight: bold;
 }
