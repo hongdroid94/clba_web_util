@@ -59,9 +59,18 @@ function App() {
             };
           }
 
-          // 남은 시간 계산
+          // 남은 시간 계산 수정
           const minutes = Math.floor(timeDiff / (1000 * 60));
           const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+          
+          // 음수 처리 추가
+          if (minutes < 0) {
+            return {
+              ...timer,
+              remainingTime: '완료!',
+              isCompleted: true
+            };
+          }
           
           return {
             ...timer,
@@ -72,7 +81,7 @@ function App() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [showNotification]);  // showNotification을 dependency에 추가
+  }, [showNotification]);
 
   // 토스트 표시 함수
   const showToast = (message: string) => {
@@ -118,19 +127,9 @@ function App() {
       return;
     }
 
-    const now = new Date();
     const [hours, minutes] = killedTime.split(':').map(Number);
-    const killedDate = new Date(now);
+    const killedDate = new Date();
     killedDate.setHours(hours, minutes, 0, 0);
-
-    // 시간 처리 로직 수정
-    if (killedDate.getTime() > now.getTime()) {
-      // 입력된 시간이 현재보다 미래인 경우, 하루 전으로 설정
-      killedDate.setDate(killedDate.getDate() - 1);
-    } else if (now.getTime() - killedDate.getTime() > 12 * 60 * 60 * 1000) {
-      // 입력된 시간이 12시간 이상 과거인 경우, 다음날로 설정
-      killedDate.setDate(killedDate.getDate() + 1);
-    }
 
     const respawnDate = new Date(killedDate);
     respawnDate.setMinutes(respawnDate.getMinutes() + (dragonType === '수룡' ? 35 : 40));
